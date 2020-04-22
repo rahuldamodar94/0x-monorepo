@@ -141,6 +141,7 @@ export interface CreateOrderFromPathOpts {
     bridgeSlippage: number;
     shouldBatchBridgeOrders: boolean;
     liquidityProviderAddress?: string;
+    multiBridgeAddress?: string;
 }
 
 // Convert sell fills into orders.
@@ -192,6 +193,11 @@ function getBridgeAddressFromSource(source: ERC20BridgeSource, opts: CreateOrder
                 throw new Error('Cannot create a LiquidityProvider order without a LiquidityProvider pool address.');
             }
             return opts.liquidityProviderAddress;
+        case ERC20BridgeSource.MultiBridge:
+            if (opts.multiBridgeAddress === undefined) {
+                throw new Error('Cannot create a MultiBridge order without a MultiBridge address.');
+            }
+            return opts.multiBridgeAddress;
         default:
             break;
     }

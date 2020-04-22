@@ -35,6 +35,7 @@ describe('MarketOperationUtils tests', () => {
     const KYBER_BRIDGE_ADDRESS = contractAddresses.kyberBridge;
     const UNISWAP_BRIDGE_ADDRESS = contractAddresses.uniswapBridge;
     const CURVE_BRIDGE_ADDRESS = contractAddresses.curveBridge;
+    const DEX_FORWARDER_BRIDGE_ADDRESS = contractAddresses.dexForwarderBridge;
 
     const MAKER_TOKEN = randomAddress();
     const TAKER_TOKEN = randomAddress();
@@ -228,7 +229,9 @@ describe('MarketOperationUtils tests', () => {
         const fn = (registryAddress: string, takerToken: string, makerToken: string): string => {
             callArgs.makerToken = makerToken;
             callArgs.takerToken = takerToken;
-            callArgs.registryAddress = registryAddress;
+            if (registryAddress !== constants.NULL_ADDRESS) {
+                callArgs.registryAddress = registryAddress;
+            }
             return liquidityProviderAddress;
         };
         return [callArgs, fn];
@@ -648,14 +651,14 @@ describe('MarketOperationUtils tests', () => {
                     { excludedSources: SELL_SOURCES, numSamples: 4, bridgeSlippage: 0, shouldBatchBridgeOrders: false },
                 );
                 expect(result.length).to.eql(1);
-                expect(result[0].makerAddress).to.eql(liquidityProviderAddress);
+                expect(result[0].makerAddress).to.eql(DEX_FORWARDER_BRIDGE_ADDRESS);
 
                 // tslint:disable-next-line:no-unnecessary-type-assertion
                 const decodedAssetData = assetDataUtils.decodeAssetDataOrThrow(
                     result[0].makerAssetData,
                 ) as ERC20BridgeAssetData;
                 expect(decodedAssetData.assetProxyId).to.eql(AssetProxyId.ERC20Bridge);
-                expect(decodedAssetData.bridgeAddress).to.eql(liquidityProviderAddress);
+                expect(decodedAssetData.bridgeAddress).to.eql(DEX_FORWARDER_BRIDGE_ADDRESS);
                 expect(result[0].takerAssetAmount).to.bignumber.eql(toSell);
                 expect(getSellQuotesParams.sources).contains(ERC20BridgeSource.LiquidityProvider);
                 expect(getSellQuotesParams.liquidityProviderAddress).is.eql(registryAddress);
