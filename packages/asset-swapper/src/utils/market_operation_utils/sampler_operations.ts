@@ -2,6 +2,7 @@ import { BigNumber, ERC20BridgeSource, SignedOrder } from '../..';
 import { getCurveInfo, isCurveSource } from '../source_utils';
 
 import { DEFAULT_FAKE_BUY_OPTS } from './constants';
+import { multiBridgeIntermediateToken } from './multibridge_utils';
 import { BatchedOperation, DexSample, FakeBuyOpts } from './types';
 
 /**
@@ -108,6 +109,33 @@ export const samplerOperations = {
             encodeCall: contract => {
                 return contract
                     .sampleSellsFromLiquidityProviderRegistry(registryAddress, takerToken, makerToken, takerFillAmounts)
+                    .getABIEncodedTransactionData();
+            },
+            handleCallResultsAsync: async (contract, callResults) => {
+                return contract.getABIDecodedReturnData<BigNumber[]>(
+                    'sampleSellsFromLiquidityProviderRegistry',
+                    callResults,
+                );
+            },
+        };
+    },
+    getMultiBridgeSellQuotes(
+        registryAddress: string,
+        makerToken: string,
+        intermediateToken: string,
+        takerToken: string,
+        takerFillAmounts: BigNumber[],
+    ): BatchedOperation<BigNumber[]> {
+        return {
+            encodeCall: contract => {
+                return contract
+                    .sampleSellsFromMultiBridgeRegistry(
+                        registryAddress,
+                        takerToken,
+                        intermediateToken,
+                        makerToken,
+                        takerFillAmounts,
+                    )
                     .getABIEncodedTransactionData();
             },
             handleCallResultsAsync: async (contract, callResults) => {
@@ -332,9 +360,11 @@ export const samplerOperations = {
                     if (multiBridgeRegistryAddress === undefined) {
                         throw new Error('Cannot sample liquidity from MultiBridge if a registry is not provided.');
                     }
-                    batchedOperation = samplerOperations.getLiquidityProviderSellQuotes(
+                    const intermediateToken = multiBridgeIntermediateToken(takerToken, makerToken);
+                    batchedOperation = samplerOperations.getMultiBridgeSellQuotes(
                         multiBridgeRegistryAddress,
                         makerToken,
+                        intermediateToken,
                         takerToken,
                         takerFillAmounts,
                     );

@@ -16,6 +16,7 @@ import * as IKyberNetwork from '../test/generated-artifacts/IKyberNetwork.json';
 import * as IKyberNetworkProxy from '../test/generated-artifacts/IKyberNetworkProxy.json';
 import * as ILiquidityProvider from '../test/generated-artifacts/ILiquidityProvider.json';
 import * as ILiquidityProviderRegistry from '../test/generated-artifacts/ILiquidityProviderRegistry.json';
+import * as IMultiBridge from '../test/generated-artifacts/IMultiBridge.json';
 import * as IUniswapExchangeQuotes from '../test/generated-artifacts/IUniswapExchangeQuotes.json';
 import * as TestERC20BridgeSampler from '../test/generated-artifacts/TestERC20BridgeSampler.json';
 export const artifacts = {
@@ -30,6 +31,7 @@ export const artifacts = {
     IKyberNetworkProxy: IKyberNetworkProxy as ContractArtifact,
     ILiquidityProvider: ILiquidityProvider as ContractArtifact,
     ILiquidityProviderRegistry: ILiquidityProviderRegistry as ContractArtifact,
+    IMultiBridge: IMultiBridge as ContractArtifact,
     IUniswapExchangeQuotes: IUniswapExchangeQuotes as ContractArtifact,
     TestERC20BridgeSampler: TestERC20BridgeSampler as ContractArtifact,
 };

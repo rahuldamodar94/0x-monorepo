@@ -17,6 +17,7 @@ import {
     ZERO_AMOUNT,
 } from './constants';
 import { collapsePath } from './fills';
+import { multiBridgeIntermediateToken } from './multibridge_utils';
 import {
     AggregationError,
     CollapsedFill,
@@ -216,6 +217,12 @@ function createBridgeOrder(fill: CollapsedFill, opts: CreateOrderFromPathOpts): 
             bridgeAddress,
             createCurveBridgeData(curveAddress, fromTokenIdx, toTokenIdx, version),
         );
+    } else if (fill.source === ERC20BridgeSource.MultiBridge) {
+        makerAssetData = assetDataUtils.encodeERC20BridgeAssetData(
+            makerToken,
+            bridgeAddress,
+            createMultiBridgeData(takerToken, makerToken),
+        );
     } else {
         makerAssetData = assetDataUtils.encodeERC20BridgeAssetData(
             makerToken,
@@ -287,6 +294,15 @@ function getMakerTakerTokens(opts: CreateOrderFromPathOpts): [string, string] {
 function createBridgeData(tokenAddress: string): string {
     const encoder = AbiEncoder.create([{ name: 'tokenAddress', type: 'address' }]);
     return encoder.encode({ tokenAddress });
+}
+
+function createMultiBridgeData(takerToken: string, makerToken: string): string {
+    const intermediateToken = multiBridgeIntermediateToken(takerToken, makerToken);
+    const encoder = AbiEncoder.create([
+        { name: 'takerToken', type: 'address' },
+        { name: 'intermediateToken', type: 'address' },
+    ]);
+    return encoder.encode({ takerToken, intermediateToken });
 }
 
 function createCurveBridgeData(

@@ -712,6 +712,41 @@ export class ERC20BridgeSamplerContract extends BaseContract {
                 constant: true,
                 inputs: [
                     {
+                        name: 'registryAddress',
+                        type: 'address',
+                    },
+                    {
+                        name: 'takerToken',
+                        type: 'address',
+                    },
+                    {
+                        name: 'intermediateToken',
+                        type: 'address',
+                    },
+                    {
+                        name: 'makerToken',
+                        type: 'address',
+                    },
+                    {
+                        name: 'takerTokenAmounts',
+                        type: 'uint256[]',
+                    },
+                ],
+                name: 'sampleSellsFromMultiBridgeRegistry',
+                outputs: [
+                    {
+                        name: 'makerTokenAmounts',
+                        type: 'uint256[]',
+                    },
+                ],
+                payable: false,
+                stateMutability: 'view',
+                type: 'function',
+            },
+            {
+                constant: true,
+                inputs: [
+                    {
                         name: 'takerToken',
                         type: 'address',
                     },
@@ -1379,6 +1414,53 @@ export class ERC20BridgeSamplerContract extends BaseContract {
                 return self._strictEncodeArguments(functionSignature, [
                     registryAddress.toLowerCase(),
                     takerToken.toLowerCase(),
+                    makerToken.toLowerCase(),
+                    takerTokenAmounts,
+                ]);
+            },
+        };
+    }
+    /**
+     * Sample sell quotes from MultiBridge.
+     * @param registryAddress Address of the MultiBridge registry contract.
+     * @param takerToken Address of the taker token (what to sell).
+     * @param intermediateToken The address of the intermediate token to        use
+     *     in an indirect route.
+     * @param makerToken Address of the maker token (what to buy).
+     * @param takerTokenAmounts Taker token sell amount for each sample.
+     * @returns makerTokenAmounts Maker amounts bought at each taker token         amount.
+     */
+    public sampleSellsFromMultiBridgeRegistry(
+        registryAddress: string,
+        takerToken: string,
+        intermediateToken: string,
+        makerToken: string,
+        takerTokenAmounts: BigNumber[],
+    ): ContractFunctionObj<BigNumber[]> {
+        const self = (this as any) as ERC20BridgeSamplerContract;
+        assert.isString('registryAddress', registryAddress);
+        assert.isString('takerToken', takerToken);
+        assert.isString('intermediateToken', intermediateToken);
+        assert.isString('makerToken', makerToken);
+        assert.isArray('takerTokenAmounts', takerTokenAmounts);
+        const functionSignature = 'sampleSellsFromMultiBridgeRegistry(address,address,address,address,uint256[])';
+
+        return {
+            async callAsync(callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<BigNumber[]> {
+                BaseContract._assertCallParams(callData, defaultBlock);
+                const rawCallResult = await self._performCallAsync(
+                    { ...callData, data: this.getABIEncodedTransactionData() },
+                    defaultBlock,
+                );
+                const abiEncoder = self._lookupAbiEncoder(functionSignature);
+                BaseContract._throwIfUnexpectedEmptyCallResult(rawCallResult, abiEncoder);
+                return abiEncoder.strictDecodeReturnValue<BigNumber[]>(rawCallResult);
+            },
+            getABIEncodedTransactionData(): string {
+                return self._strictEncodeArguments(functionSignature, [
+                    registryAddress.toLowerCase(),
+                    takerToken.toLowerCase(),
+                    intermediateToken.toLowerCase(),
                     makerToken.toLowerCase(),
                     takerTokenAmounts,
                 ]);
