@@ -21,6 +21,10 @@
             {
                 "note": "Added `ERC20BridgeSampler.sampleBuysFromKyberNetwork`",
                 "pr": 2551
+            },
+            {
+                "note": "Add `ITransformERC20`",
+                "pr": "TODO"
             }
         ]
     },
