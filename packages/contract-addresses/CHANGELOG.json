@@ -57,6 +57,10 @@
             {
                 "note": "Redeploy ERC20BridgeSampler on Mainnet using `Kyber.searchBestRate`",
                 "pr": 2575
+            },
+            {
+                "note": "Updated Mainnet ERC20BridgeSampler address",
+                "pr": 2593
             }
         ]
     },

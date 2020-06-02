@@ -77,6 +77,10 @@
             {
                 "note": "Increase timeout for tests",
                 "pr": 2587
+            },
+            {
+                "note": "Add support for MultiBridge",
+                "pr": 2593
             }
         ]
     },
